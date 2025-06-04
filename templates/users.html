@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Пользователи OpenVPN{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Добавить пользователя</h2>
+
+<form method="POST" class="card shadow p-4 mb-5">
+    <div class="mb-3">
+        <input type="text" name="first_name" class="form-control" placeholder="Имя" required>
+    </div>
+    <div class="mb-3">
+        <input type="text" name="last_name" class="form-control" placeholder="Фамилия" required>
+    </div>
+    <div class="mb-3">
+        <input type="text" name="username" class="form-control" placeholder="Логин" required>
+    </div>
+    <div class="mb-3">
+        <div class="input-group">
+            <input type="text" name="password" id="passwordInput" class="form-control" placeholder="Пароль" required>
+            <button type="button" class="btn btn-outline-secondary" onclick="generatePassword()">Сгенерировать</button>
+        </div>
+    </div>
+    <div class="mb-3">
+        <select name="branch_id" class="form-select">
+            <option value="">--- Без филиала ---</option>
+            {% for branch in branches %}
+                <option value="{{ branch.id }}">{{ branch.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success w-100">Добавить</button>
+</form>
+
+<h2 class="mb-4">Пользователи OpenVPN</h2>
+<table id="mainTable" class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Логин</th>
+            <th>Филиал</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr {% if not user.is_active %} class="table-secondary text-muted" {% endif %}>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.branch.name if user.branch else "Без филиала" }}</td>
+            <td class="d-flex flex-wrap gap-1">
+                <form method="POST" action="{{ url_for('toggle_user', user_id=user.id) }}">
+                    {% if user.is_active %}
+                    <button type="submit" class="btn btn-sm btn-warning">Заблокировать</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-sm btn-success">Разблокировать</button>
+                    {% endif %}
+                </form>
+                <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить пользователя?');">Удалить</button>
+                </form>
+                <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm">Редактировать</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#mainTable').DataTable({
+        "language": {
+            "search": "Поиск:",
+            "lengthMenu": "Показать _MENU_ записей",
+            "info": "Показано с _START_ по _END_ из _TOTAL_ записей",
+            "paginate": {
+                "first": "Первая",
+                "last": "Последняя",
+                "next": "Следующая",
+                "previous": "Предыдущая"
+            }
+        }
+    });
+
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+
+<script>
+function generatePassword() {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+    let password = "";
+    for (let i = 0, n = charset.length; i < length; ++i) {
+        password += charset.charAt(Math.floor(Math.random() * n));
+    }
+    document.getElementById("passwordInput").value = password;
+}
+</script>
+{% endblock %}

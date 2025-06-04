@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Редактировать пользователя{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Редактировать пользователя</h2>
+
+<form method="POST" class="card shadow p-4 mb-5">
+    <div class="mb-3">
+        <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" placeholder="Имя" required>
+    </div>
+    <div class="mb-3">
+        <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" placeholder="Фамилия" required>
+    </div>
+    <div class="mb-3">
+        <input type="text" name="username" class="form-control" value="{{ user.username }}" placeholder="Логин" required>
+    </div>
+    <div class="mb-3">
+        <input type="password" name="password" class="form-control" placeholder="Новый пароль (если нужно)">
+    </div>
+    <div class="mb-3">
+        <select name="branch_id" class="form-select">
+            <option value="">--- Без филиала ---</option>
+            {% for branch in branches %}
+                <option value="{{ branch.id }}" {% if user.branch_id == branch.id %}selected{% endif %}>{{ branch.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Сохранить изменения</button>
+</form>
+
+<a href="{{ url_for('users') }}" class="btn btn-secondary">Назад к пользователям</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+setTimeout(function() {
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        var bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+}, 5000);
+</script>
+{% endblock %}
+

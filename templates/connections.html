@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Подключённые пользователи{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Текущие подключения OpenVPN</h2>
+    <small class="text-muted" id="last-updated">Обновлено: —</small>
+</div>
+
+<div id="vpn-table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Логин</th>
+                <th>IP клиента</th>
+                <th>IP VPN</th>
+                <th>Принято (байт)</th>
+                <th>Отправлено (байт)</th>
+                <th>Подключен с</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody id="vpn-table-body">
+            {% for conn in connections %}
+            <tr>
+                <td>{{ conn.username }}</td>
+                <td>{{ conn.real_ip }}</td>
+                <td>{{ conn.vpn_ip }}</td>
+                <td>{{ conn.bytes_received }}</td>
+                <td>{{ conn.bytes_sent }}</td>
+                <td>{{ conn.connected_since }}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="killUser(this.dataset.username)" data-username="{{ conn.username }}">Отключить</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadConnections() {
+    fetch("/api/connections")
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById("vpn-table-body");
+            tbody.innerHTML = "";
+
+            if (data.connections) {
+                data.connections.forEach(conn => {
+                    const row = `<tr>
+                        <td>${conn.username}</td>
+                        <td>${conn.real_ip}</td>
+                        <td>${conn.vpn_ip}</td>
+                        <td>${conn.bytes_received}</td>
+                        <td>${conn.bytes_sent}</td>
+                        <td>${conn.connected_since}</td>
+                        <td>
+                            <button class='btn btn-sm btn-danger' onclick="killUser('${conn.username}')">Отключить</button>
+                        </td>
+                    </tr>`;
+                    tbody.insertAdjacentHTML("beforeend", row);
+                });
+                const now = new Date();
+                document.getElementById("last-updated").innerText = "Обновлено: " + now.toLocaleTimeString();
+            }
+        })
+        .catch(err => console.error("Ошибка при загрузке подключений:", err));
+}
+
+function killUser(username) {
+    if (!confirm(`Отключить пользователя ${username}?`)) return;
+
+    fetch(`/api/kill/${username}`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        loadConnections();
+    })
+    .catch(err => {
+        alert("Ошибка при попытке отключить пользователя: " + err);
+    });
+}
+
+loadConnections();
+setInterval(loadConnections, 10000);
+</script>
+{% endblock %}
+

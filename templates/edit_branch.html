@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Редактировать филиал{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Редактировать филиал</h2>
+
+<form method="POST" class="card shadow p-4 mb-5">
+    <div class="mb-3">
+        <input type="text" name="name" class="form-control" value="{{ branch.name }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Сохранить изменения</button>
+</form>
+
+<a href="{{ url_for('branches') }}" class="btn btn-secondary">Назад к филиалам</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+setTimeout(function() {
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        var bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+}, 5000);
+</script>
+{% endblock %}
+
