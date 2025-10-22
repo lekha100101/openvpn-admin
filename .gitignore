@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# SQLite
+data.db
+instance/
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+auth.log
+
+# OS/IDE
+.DS_Store
+*.swp
+.idea/
+.vscode/
+

@@ -23,6 +23,12 @@
         <a href="{{ url_for('connections') }}" class="btn btn-outline-primary">Подключения</a>
         <a href="{{ url_for('users') }}" class="btn btn-outline-primary">Пользователи</a>
         <a href="{{ url_for('branches') }}" class="btn btn-outline-secondary">Филиалы</a>
+        {% if current_user.is_authenticated and current_user.role in ['admin','superadmin'] %}
+          <a href="{{ url_for('audit_list') }}" class="btn btn-outline-secondary">Журнал</a>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.role == 'superadmin' %}
+          <a href="{{ url_for('admins') }}" class="btn btn-outline-secondary">Администраторы</a>
+        {% endif %}
         <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Выйти</a>
       </div>
     </div>

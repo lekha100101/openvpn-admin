@@ -15,6 +15,10 @@ class Config:
     # Название сайта
     APP_TITLE = "OpenVPN Admin Panel Жамбылская Область"
 
+    # Логирование веб-панели
+    LOG_DIR = os.environ.get("WEBADMIN_LOG_DIR", "logs")
+    LOG_FILE = os.environ.get("WEBADMIN_LOG_FILE", "webadmin.log")
+
     # Дополнительно (если понадобится позже)
     # MAIL_SERVER = "smtp.example.com"
     # MAIL_PORT = 587

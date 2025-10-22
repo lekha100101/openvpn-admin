@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Журнал действий{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Журнал действий</h2>
+  <a class="btn btn-outline-primary" href="{{ url_for('audit_export_csv') }}">Экспорт CSV</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-3"><input name="action" class="form-control" placeholder="action" value="{{ request.args.get('action','') }}"></div>
+  <div class="col-md-3"><input name="username" class="form-control" placeholder="username" value="{{ request.args.get('username','') }}"></div>
+  <div class="col-md-3">
+    <select name="status" class="form-select">
+      <option value="">any</option>
+      <option value="success" {{ 'selected' if request.args.get('status')=='success' else '' }}>success</option>
+      <option value="error" {{ 'selected' if request.args.get('status')=='error' else '' }}>error</option>
+    </select>
+  </div>
+  <div class="col-md-3"><button class="btn btn-secondary w-100">Фильтр</button></div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Время</th><th>Админ</th><th>Действие</th><th>Цель</th><th>Статус</th><th>IP</th><th>User-Agent</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{{ r.created_at }}</td>
+        <td>{{ r.username }}</td>
+        <td>{{ r.action }}</td>
+        <td>{{ (r.target_type or '') ~ ':' ~ (r.target_id or '') }}</td>
+        <td>{{ r.status }}</td>
+        <td>{{ r.ip_address }}</td>
+        <td><small class="text-muted">{{ r.user_agent }}</small></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
+
