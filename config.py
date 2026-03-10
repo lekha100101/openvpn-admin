@@ -13,7 +13,7 @@ class Config:
     OVPN_STATUS_LOG = "/var/log/openvpn/openvpn-status.log"
 
     # Название сайта
-    APP_TITLE = "OpenVPN Admin Panel Жамбылская Область"
+    APP_TITLE = "OpenVPN Admin Panel город Алматы"
 
     # Логирование веб-панели
     LOG_DIR = os.environ.get("WEBADMIN_LOG_DIR", "logs")

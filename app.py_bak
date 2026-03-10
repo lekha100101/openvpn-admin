@@ -34,9 +34,7 @@ def create_app():
     app.logger.setLevel(logging.INFO)
     app.logger.addHandler(_handler)
 
-#    limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
-#    limiter.init_app(app)
-    limiter = Limiter(key_func=get_remote_address)
+    limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
     limiter.init_app(app)
 
     db.init_app(app)
@@ -131,10 +129,6 @@ def create_app():
                 flash('Неверный логин или пароль.', 'danger')
                 return redirect(url_for('login'))
         return render_template('login.html')
-    
-    def ovpn_rate_key():
-        # client_ip приходит из auth-check.sh (untrusted_ip)
-        return request.form.get("client_ip") or get_remote_address()
 
     @app.route('/logout')
     @login_required
@@ -302,13 +296,10 @@ def create_app():
         return redirect(url_for('users'))
 
     @app.route('/api/authenticate', methods=['POST'])
-    @limiter.limit("30 per minute", key_func=ovpn_rate_key)
     def api_authenticate():
         username = request.form.get('username')
         password = request.form.get('password')
-#        client_ip = request.remote_addr
-        client_ip = request.form.get('client_ip') or request.remote_addr
-        client_port = request.form.get('client_port')
+        client_ip = request.remote_addr
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         if not username or not password:
